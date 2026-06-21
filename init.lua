@@ -102,7 +102,7 @@ vim.g.have_nerd_font = false
 vim.o.number = true
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
--- vim.o.relativenumber = true
+vim.o.relativenumber = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.o.mouse = 'a'
@@ -140,6 +140,17 @@ vim.o.timeoutlen = 300
 -- Configure how new splits should be opened
 vim.o.splitright = true
 vim.o.splitbelow = true
+
+local set = vim.opt
+
+-- Set the visual width of a tab character to 4 spaces
+set.tabstop = 4
+-- Set the number of spaces used for auto-indentation
+set.shiftwidth = 4
+-- Pressing <Tab> in insert mode will insert spaces instead of a tab character
+set.expandtab = true
+-- Set the number of spaces a <Tab> counts for when expandtab is off
+set.softtabstop = 4
 
 -- Sets how neovim will display certain whitespace characters in the editor.
 --  See `:help 'list'`
@@ -198,12 +209,6 @@ vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left wind
 vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
-
--- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
--- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
--- vim.keymap.set("n", "<C-S-l>", "<C-w>L", { desc = "Move window to the right" })
--- vim.keymap.set("n", "<C-S-j>", "<C-w>J", { desc = "Move window to the lower" })
--- vim.keymap.set("n", "<C-S-k>", "<C-w>K", { desc = "Move window to the upper" })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -284,6 +289,42 @@ require('lazy').setup({
     },
   },
 
+  {
+    'stevearc/oil.nvim',
+
+    dependencies = {
+      { 'nvim-mini/mini.icons', opts = {} },
+    },
+
+    opts = {
+      keymaps = {
+        ['<C-h>'] = false,
+        ['<M-h>'] = 'actions.select_split',
+      },
+
+      view_options = {
+        show_hidden = true,
+      },
+    },
+
+    config = function(_, opts)
+      require('oil').setup(opts)
+
+      -- Open parent directory
+      vim.keymap.set('n', '-', '<CMD>Oil<CR>', {
+        desc = 'Open parent directory',
+      })
+
+      -- Toggle floating Oil window
+      vim.keymap.set('n', '<space>-', function()
+        require('oil').toggle_float()
+      end, {
+        desc = 'Toggle Oil float',
+      })
+    end,
+
+    lazy = false,
+  },
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
   --
   -- This is often very useful to both group configuration, as well as handle
